@@ -278,7 +278,11 @@ class CommonBase(type):
         :return: attributes with ``Meta`` class from combined parents
         """
         # pop the meta class from the attributes
-        meta = attr.pop(mcs._meta_cls, types.ClassType(mcs._meta_cls, (), {}))
+        # FIXME: this is a little hacky for python2 to 3 compatibility
+        try:
+            meta = attr.pop(mcs._meta_cls, types.ClassType(mcs._meta_cls, (), {}))
+        except AttributeError:
+            meta = attr.pop(mcs._meta_cls, type(mcs._meta_cls, (), {}))
         # get a list of the meta public class attributes
         meta_attrs = get_public_attributes(meta)
         # check all bases for meta
