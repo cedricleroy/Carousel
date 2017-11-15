@@ -5,7 +5,11 @@ This module provides the base classes for data readers, such as
 which are used to read in data sources.
 """
 
-from StringIO import StringIO
+# python2 / 3 compatibility
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 from carousel.core import UREG, Q_
 from carousel.core.exceptions import (
     UnnamedDataError, MixedTextNoMatchError
