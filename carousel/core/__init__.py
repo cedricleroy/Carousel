@@ -18,6 +18,7 @@ See the :ref:`dev-intro` in the developer section for more information on each
 section.
 """
 
+from future.utils import viewkeys, iteritems
 import pint
 import os
 from inspect import getargspec
@@ -116,17 +117,17 @@ class Registry(dict):
             :exc:`~carousel.core.exceptions.DuplicateRegItemError`,
             :exc:`~carousel.core.exceptions.MismatchRegMetaKeysError`
         """
-        newkeys = newitems.viewkeys()  # set of the new item keys
-        if any(self.viewkeys() & newkeys):  # duplicates
-            raise DuplicateRegItemError(self.viewkeys() & newkeys)
+        newkeys = viewkeys(newitems)  # set of the new item keys
+        if any(viewkeys(self) & newkeys):  # duplicates
+            raise DuplicateRegItemError(viewkeys(self) & newkeys)
         self.update(newitems)  # register new item
         # update meta fields
         kwargs.update(zip(self.meta_names, args))
-        for k, v in kwargs.iteritems():
+        for k, v in iteritems(kwargs):
             meta = getattr(self, k)  # get the meta attribute
             if v:
-                if not v.viewkeys() <= newkeys:
-                    raise MismatchRegMetaKeysError(newkeys - v.viewkeys())
+                if not viewkeys(v) <= newkeys:
+                    raise MismatchRegMetaKeysError(newkeys - viewkeys(v))
                 meta.update(v)  # register meta
 
     def unregister(self, items):
@@ -323,15 +324,15 @@ class CommonBase(type):
             with open(param_file, 'r') as param_file:
                 file_params = json.load(param_file)
             # update meta from file
-            for k, v in file_params.pop(mcs._meta_cls, {}).iteritems():
+            for k, v in iteritems(file_params.pop(mcs._meta_cls, {})):
                 setattr(meta, k, v)
             # dictionary of parameters for reading source file
             attr[mcs._param_attr] = {
-                k: mcs._param_cls(**v) for k, v in file_params.iteritems()
+                k: mcs._param_cls(**v) for k, v in iteritems(file_params)
             }
         # get parameters from class
         parameters = dict.fromkeys(
-            k for k, v in attr.iteritems() if isinstance(v, Parameter)
+            k for k, v in iteritems(attr) if isinstance(v, Parameter)
         )
         # update parameters
         for k in parameters:
@@ -359,7 +360,7 @@ class Parameter(dict):
     def __init__(self, *args, **kwargs):
         items = dict(zip(self._attrs, args))
         extras = {}
-        for key, val in kwargs.iteritems():
+        for key, val in iteritems(kwargs):
             if key in self._attrs:
                 items[key] = val
             else:
@@ -369,6 +370,6 @@ class Parameter(dict):
 
     def __repr__(self):
         fmt = ('<%s(' % self.__class__.__name__)
-        fmt += ', '.join('%s=%r' % (k, v) for k, v in self.iteritems())
+        fmt += ', '.join('%s=%r' % (k, v) for k, v in iteritems(self))
         fmt += ')>'
         return fmt
