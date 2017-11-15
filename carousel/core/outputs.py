@@ -5,6 +5,7 @@ This module provides the framework for output from Carousel. It is similar
 to the data layer except output sources are always calculations.
 """
 
+from future.utils import with_metaclass
 from carousel.core import logging, CommonBase, UREG, Q_, Registry, Parameter
 import json
 import numpy as np
@@ -78,7 +79,7 @@ class OutputBase(CommonBase):
         return super(OutputBase, mcs).__new__(mcs, name, bases, attr)
 
 
-class Output(object):
+class Output(with_metaclass(OutputBase)):
     """
     A class for formatting outputs.
 
@@ -103,8 +104,6 @@ class Output(object):
             hourly_energy = {'init': 0, 'units': 'Wh', 'size': 8760}
             yearly_energy = {'init': 0, 'units': 'kWh'}
     """
-    __metaclass__ = OutputBase
-
     def __init__(self):
         #: outputs initial value
         self.initial_value = {}

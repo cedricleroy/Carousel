@@ -6,6 +6,7 @@ from the Formula class in this module. Formula sources must include a
 formula importer, or can subclass one of the formula importers here.
 """
 
+from future.utils import with_metaclass
 from carousel.core import logging, CommonBase, Registry, UREG, Parameter
 import imp
 import importlib
@@ -201,7 +202,7 @@ class FormulaBase(CommonBase):
         return super(FormulaBase, mcs).__new__(mcs, name, bases, attr)
 
 
-class Formula(object):
+class Formula(with_metaclass(FormulaBase)):
     """
     A class for formulas.
 
@@ -216,8 +217,6 @@ class Formula(object):
     This is the required interface for all source files containing formulas
     used in Carousel.
     """
-    __metaclass__ = FormulaBase
-
     def __init__(self):
         # check for path listed in param file
         path = getattr(self._meta, 'path', None)

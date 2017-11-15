@@ -15,6 +15,7 @@ for data sources are as follows:
 """
 
 from future.utils import iteritems
+from future.utils import with_metaclass
 from carousel.core import (
     UREG, Registry, CarouselJSONEncoder, CommonBase, Parameter
 )
@@ -137,7 +138,7 @@ class DataSourceBase(CommonBase):
         return super(DataSourceBase, mcs).__new__(mcs, name, bases, attr)
 
 
-class DataSource(object):
+class DataSource(with_metaclass(DataSourceBase)):
     """
     Required interface for all Carousel data sources such as PVSim results,
     TMY3 data and calculation input files.
@@ -155,8 +156,6 @@ class DataSource(object):
     This is the required interface for all source files containing data used in
     Carousel.
     """
-    __metaclass__ = DataSourceBase
-
     def __init__(self, *args, **kwargs):
         # save arguments, might need them later
         self.args = args  #: positional arguments

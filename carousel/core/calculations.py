@@ -5,6 +5,7 @@ This module provides base classes for calculations. All calculations should
 inherit from one of the calcs in this module.
 """
 
+from future.utils import with_metaclass
 from carousel.core import logging, CommonBase, Registry, UREG, Parameter
 from carousel.core.calculators import Calculator
 
@@ -76,12 +77,10 @@ class CalcBase(CommonBase):
         return super(CalcBase, mcs).__new__(mcs, name, bases, attr)
 
 
-class Calc(object):
+class Calc(with_metaclass(CalcBase)):
     """
     A class for all calculations.
     """
-    __metaclass__ = CalcBase
-
     def __init__(self):
         meta = getattr(self, CalcBase._meta_attr)
         parameters = getattr(self, CalcBase._param_attr)

@@ -20,6 +20,7 @@ options such as how long the simulation should run and takes care of actually
 running the simulation.
 """
 
+from future.utils import with_metaclass
 import importlib
 import json
 import os
@@ -74,15 +75,13 @@ class ModelBase(CommonBase):
         return super(ModelBase, mcs).__new__(mcs, name, bases, attr)
 
 
-class Model(object):
+class Model(with_metaclass(ModelBase)):
     """
     A class for models. Carousel is a subclass of the :class:`Model` class.
 
     :param modelfile: The name of the JSON file with model data.
     :type modelfile: str
     """
-    __metaclass__ = ModelBase
-
     def __init__(self, modelfile=None):
         meta = getattr(self, ModelBase._meta_attr)
         parameters = getattr(self, ModelBase._param_attr)
