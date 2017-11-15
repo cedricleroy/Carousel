@@ -2,6 +2,7 @@
 A lazy calculator that just loops over formulas.
 """
 
+from future.utils import iteritems
 from carousel.core.calculators import Calculator, index_registry
 from carousel.core import logging, Q_
 import numpy as np
@@ -166,7 +167,7 @@ class LazyLoopingCalculator(Calculator):
         # get values of repeat data and outputs from registries
         rargs = dict(index_registry(data_rargs, data_reg, timestep, idx),
                      **index_registry(out_rargs, out_reg, timestep, idx))
-        rargkeys, rargvals = zip(*rargs.iteritems())  # split keys and values
+        rargkeys, rargvals = zip(*iteritems(rargs))  # split keys and values
         rargvals = zip(*rargvals)  # reshuffle values, should be same size?
         # allocate dictionary of empty numpy arrays for each return value
         returns = calc['returns']  # return keys
@@ -198,21 +199,21 @@ class LazyLoopingCalculator(Calculator):
             # TODO: instead of using copies rewrite index_registry to do this
             # copies means that calculations can't use a registry backend that
             # uses shared memory, which will limit ability to run asynchronously
-            for k, v in data_rargs.iteritems():
+            for k, v in iteritems(data_rargs):
                 data_reg_copy[v] = rargs_keys[k]
-            for k, v in out_rargs.iteritems():
+            for k, v in iteritems(out_rargs):
                 out_reg_copy[v] = rargs_keys[k]
             # run base calculator to get retvals, var, unc and jac
             base_calculator(calc, formula_reg, data_reg_copy, out_reg_copy,
                             timestep, idx)
             # re-assign retvals for this index of repeats
-            for rv, rval in retvals.iteritems():
+            for rv, rval in iteritems(retvals):
                 rval.append(out_reg_copy[rv].m)  # append magnitude to returns
                 retvalu[rv] = out_reg_copy[rv].u  # save units for this repeat
                 # re-assign variance for this index of repeats
                 if out_reg_copy.variance.get(rv) is None:
                     continue
-                for rv2, rval2 in ret_var.iteritems():
+                for rv2, rval2 in iteritems(ret_var):
                     rval2[rv].append(out_reg_copy.variance[rv2][rv])
                     # uncertainty only on diagonal of variance
                     if rv == rv2:
@@ -225,10 +226,10 @@ class LazyLoopingCalculator(Calculator):
                 if ret_jac[rv] is None:
                     # first time through create dictionary of sensitivities
                     ret_jac[rv] = {o: v for o, v in
-                                   out_reg_copy.jacobian[rv].iteritems()}
+                                   iteritems(out_reg_copy.jacobian[rv])}
                 else:
                     # next time through, vstack the sensitivities to existing
-                    for o, v in out_reg_copy.jacobian[rv].iteritems():
+                    for o, v in iteritems(out_reg_copy.jacobian[rv]):
                         ret_jac[rv][o] = np.vstack((ret_jac[rv][o], v))
         LOGGER.debug('ret_jac:\n%r', ret_jac)
         # TODO: handle jacobian for repeat args and for dynamic simulations
