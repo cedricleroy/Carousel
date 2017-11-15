@@ -4,6 +4,7 @@ Custom data readers including :class:`carousel.contrib.readers.ArgumentReader`,
 :class:`carousel.contrib.readers.HDF5Reader`.
 """
 
+from future.utils import iteritems
 import numpy as np
 import h5py
 from carousel.core.data_readers import DataReader
@@ -66,7 +67,7 @@ class ArgumentReader(DataReader):
         # get positional argument names from parameters and apply them to args
         # update data with additional kwargs
         argpos = {
-            v['extras']['argpos']: k for k, v in self.parameters.iteritems()
+            v['extras']['argpos']: k for k, v in iteritems(self.parameters)
             if 'argpos' in v['extras']
         }
         data = dict(
@@ -85,7 +86,7 @@ class ArgumentReader(DataReader):
         :return: data with units applied
         """
         # if units key exists then apply
-        for k, v in self.parameters.iteritems():
+        for k, v in iteritems(self.parameters):
             if v and v.get('units'):
                 data[k] = Q_(data[k], v.get('units'))
         return data
@@ -145,7 +146,7 @@ class HDF5Reader(ArgumentReader):
     def load_data(self, h5file, *args, **kwargs):
         with h5py.File(h5file) as h5f:
             h5data = dict.fromkeys(self.parameters)
-            for param, attrs in self.parameters.iteritems():
+            for param, attrs in iteritems(self.parameters):
                 LOGGER.debug('parameter:\n%r', param)
                 node = attrs['extras']['node']  # full name of node
                 # composite datatype member
