@@ -189,7 +189,7 @@ class LazyLoopingCalculator(Calculator):
             calc_outs_keys = []  # if there are no outputs, leave it empty
         # copy returns and this calculations output arguments from output reg
         data_reg_copy = reg_copy(data_reg, calc_data_keys)
-        out_reg_copy = reg_copy(out_reg, returns + calc_outs_keys)
+        out_reg_copy = reg_copy(out_reg, returns + list(calc_outs_keys))
         # loop over first repeat arg values and enumerate numpy indices as n
         for vals in rargvals:
             rargs_keys = dict(zip(rargkeys, vals))
