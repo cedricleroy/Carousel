@@ -19,5 +19,5 @@ PROJ_PATH = os.path.join(PKG_PATH, PROJECT.lower())
 
 sys.path.append(PKG_PATH)
 sandia_performance_model = importlib.import_module(
-    '.%s' % MODEL, PROJECT.lower()
+    PROJECT.lower() + '.' + MODEL
 )
