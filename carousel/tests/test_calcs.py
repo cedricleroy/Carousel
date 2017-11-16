@@ -3,6 +3,7 @@ test calculations
 """
 
 from future.utils import iteritems
+from past.builtins import xrange
 from nose.tools import ok_, eq_
 from carousel.core.calculations import Calc, CalcParameter
 from carousel.core.calculators import Calculator
