@@ -2,6 +2,7 @@
 Sandia Performance Model
 """
 
+from future.utils import iteritems
 from carousel.core.data_sources import DataSource
 from carousel.core.formulas import Formula
 from carousel.core.calculations import Calc
@@ -38,7 +39,7 @@ class PVPowerData(DataSource):
             self.data[k] = k
             self.isconstant[k] = True
         # apply metadata
-        for k, v in parameters.iteritems():
+        for k, v in iteritems(parameters):
             # TODO: this should be applied in data reader using _meta_names from
             # data registry which should use a meta class and all parameter
             # files should have same layout even xlrd and numpy readers, etc.

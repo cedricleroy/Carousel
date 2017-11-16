@@ -2,6 +2,7 @@
 test formulas
 """
 
+from future.utils import iteritems
 from nose.tools import ok_, eq_
 import numpy as np
 from carousel.core import UREG
@@ -44,7 +45,7 @@ def test_formulas_metaclass():
 
     formulas_test2 = FormulaTest2()
     ok_(isinstance(formulas_test2, Formula))
-    for k, v in formulas_test2.parameters.iteritems():
+    for k, v in iteritems(formulas_test2.parameters):
         eq_(formulas_test1.parameters[k], v)
 
 
