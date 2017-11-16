@@ -5,7 +5,7 @@ This module provides the framework for output from Carousel. It is similar
 to the data layer except output sources are always calculations.
 """
 
-from future.utils import with_metaclass
+from future.utils import with_metaclass, iteritems
 from carousel.core import logging, CommonBase, UREG, Q_, Registry, Parameter
 import json
 import numpy as np
@@ -125,7 +125,7 @@ class Output(with_metaclass(OutputBase)):
         self.output_source = {}
         #: calculation outputs
         self.outputs = {}
-        for k, v in self.parameters.iteritems():
+        for k, v in iteritems(self.parameters):
             self.initial_value[k] = v.get('init')  # returns None if missing
             self.size[k] = v.get('size') or 1  # minimum size is 1
             self.uncertainty[k] = None  # uncertainty for outputs is calculated
