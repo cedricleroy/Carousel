@@ -104,7 +104,7 @@ class PyModuleImporter(FormulaImporter):
         except KeyError:
             try:
                 # import module specified in parameters
-                mod = importlib.import_module(module, package)
+                mod = importlib.import_module(package + module)
             except ImportError as err:
                 if not path:
                     msg = ('%s could not be imported either because it was not '
