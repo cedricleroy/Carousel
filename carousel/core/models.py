@@ -338,7 +338,7 @@ class Model(with_metaclass(ModelBase)):
         cmds = cmd.split(None, 1)  # split commands and simulations
         sim_names = cmds[1:]  # simulations
         if not sim_names:
-            sim_names = self.cmd_layer.reg.iterkeys()
+            sim_names = [key for key in self.cmd_layer.reg]
         for sim_name in sim_names:
             sim_cmd = getattr(self.cmd_layer.reg[sim_name], cmd)
             sim_cmd(self, progress_hook=progress_hook, *args, **kwargs)
