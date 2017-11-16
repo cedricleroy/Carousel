@@ -7,6 +7,7 @@ the simulation. It gets all its info from the model, which in turn gets it from
 each layer which gets info from the layers' sources.
 """
 
+from future.utils import iteritems
 from carousel.core import logging, CommonBase, Registry, UREG, Q_, Parameter
 from carousel.core.exceptions import CircularDependencyError, MissingDataError
 import json
@@ -14,7 +15,10 @@ import errno
 import os
 import sys
 import numpy as np
-import Queue
+try:
+    import Queue
+except ModuleNotFoundError:
+    from queue import Queue
 import functools
 from datetime import datetime
 
@@ -79,7 +83,7 @@ def topological_sort(dag):
         <https://en.wikipedia.org/wiki/Directed_acyclic_graph>`_
     """
     # find all edges of dag
-    topsort = [node for node, edge in dag.iteritems() if not edge]
+    topsort = [node for node, edge in iteritems(dag) if not edge]
     # loop through nodes until topologically sorted
     while len(topsort) < len(dag):
         num_nodes = len(topsort)  # number of nodes
@@ -201,7 +205,7 @@ class Simulation(object):
                 file_params = json.load(param_file)
                 #: simulation parameters from file
                 self.parameters = {settings: SimParameter(**params) for
-                                   settings, params in file_params.iteritems()}
+                                   settings, params in iteritems(file_params)}
         # if not subclassed and metaclass skipped, then use kwargs
         if not hasattr(self, 'parameters'):
             #: parameter file
@@ -225,13 +229,13 @@ class Simulation(object):
         self.write_frequency = 0
         self.write_fields = {}
         # pop deprecated attribute names
-        for k, v in self.deprecated.iteritems():
+        for k, v in iteritems(self.deprecated):
             val = self.parameters['extras'].pop(v, None)
             # update parameters if deprecated attr used and no new attr
             if val and k not in self.parameters:
                 self.parameters[k] = val
         # Attributes
-        for k, v in self.attrs.iteritems():
+        for k, v in iteritems(self.attrs):
             setattr(self, k, self.parameters.get(k, v))
         # member docstrings are in documentation since attrs are generated
         if self.ID is None:
@@ -443,14 +447,14 @@ class Simulation(object):
             self.interval_idx = idx_tot  # update simulation interval counter
             idx = idx_tot % self.write_frequency
             # update properties
-            for k, v in out_reg.isproperty.iteritems():
+            for k, v in iteritems(out_reg.isproperty):
                 # set properties from previous interval at night
                 if v:
                     out_reg[k][idx] = out_reg[k][idx - 1]
             # night if any threshold exceeded
             if self.thresholds:
                 night = not all(limits[0] < data_reg[data][idx] < limits[1] for
-                                data, limits in self.thresholds.iteritems())
+                                data, limits in iteritems(self.thresholds))
             else:
                 night = None
             # daytime or always calculated outputs
@@ -541,7 +545,7 @@ class Simulation(object):
         data = kwargs.get('data', {})
         if not data and args:
             data = args[0]
-        for k, v in data.iteritems():
+        for k, v in iteritems(data):
             progress_hook('loading simulation for %s' % k)
             model.data.open(k, **v)
         self.check_data(model.data)
