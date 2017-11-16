@@ -7,7 +7,8 @@ the simulation. It gets all its info from the model, which in turn gets it from
 each layer which gets info from the layers' sources.
 """
 
-from future.utils import iteritems
+from future.utils import with_metaclass, iteritems, viewkeys
+from past.builtins import basestring
 from carousel.core import logging, CommonBase, Registry, UREG, Q_, Parameter
 from carousel.core.exceptions import CircularDependencyError, MissingDataError
 import json
@@ -18,7 +19,7 @@ import numpy as np
 try:
     import Queue
 except ModuleNotFoundError:
-    from queue import Queue
+    import queue as Queue
 import functools
 from datetime import datetime
 
@@ -88,14 +89,14 @@ def topological_sort(dag):
     while len(topsort) < len(dag):
         num_nodes = len(topsort)  # number of nodes
         # unsorted nodes
-        for node in dag.viewkeys() - set(topsort):
+        for node in viewkeys(dag) - set(topsort):
             # nodes with no incoming edges
             if set(dag[node]) <= set(topsort):
                 topsort.append(node)
                 break
         # circular dependencies
         if len(topsort) == num_nodes:
-            raise CircularDependencyError(dag.viewkeys() - set(topsort))
+            raise CircularDependencyError(viewkeys(dag) - set(topsort))
     return topsort
 
 
@@ -157,7 +158,7 @@ class SimBase(CommonBase):
         return super(SimBase, mcs).__new__(mcs, name, bases, attr)
 
 
-class Simulation(object):
+class Simulation(with_metaclass(SimBase)):
     """
     A class for simulations.
 
@@ -177,7 +178,6 @@ class Simulation(object):
     Any additional settings provided as keyword arguments will override settings
     from file.
     """
-    __metaclass__ = SimBase
     attrs = {
         'ID': None,
         'path': os.path.join('~', 'Carousel', 'Simulations'),
@@ -215,7 +215,7 @@ class Simulation(object):
         else:
             # use first settings
             if settings is None:
-                self.settings, self.parameters = self.parameters.items()[0]
+                self.settings, self.parameters = list(self.parameters.items())[0]
             else:
                 #: name of sim settings used for parameters
                 self.settings = settings
