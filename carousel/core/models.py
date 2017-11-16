@@ -20,7 +20,8 @@ options such as how long the simulation should run and takes care of actually
 running the simulation.
 """
 
-from future.utils import with_metaclass
+from future.utils import with_metaclass, iteritems, viewkeys
+from past.builtins import basestring
 import importlib
 import json
 import os
@@ -68,7 +69,7 @@ class ModelBase(CommonBase):
         attr = mcs.set_param_file_or_parameters(attr)
         # set default meta attributes
         meta = attr[mcs._meta_attr]
-        for ma, dflt in mcs._attr_default.iteritems():
+        for ma, dflt in iteritems(mcs._attr_default):
             a = getattr(meta, ma, None)
             if a is None:
                 setattr(meta, ma, dflt)
@@ -132,7 +133,7 @@ class Model(with_metaclass(ModelBase)):
         # read and load JSON parameter map file as "parameters"
         with open(self.param_file, 'r') as param_file:
             file_params = json.load(param_file)
-            for layer, params in file_params.iteritems():
+            for layer, params in iteritems(file_params):
                 # update parameters from file
                 self.parameters[layer] = ModelParameter(**params)
         # if layer argument spec'd then only update/load spec'd layer
@@ -175,7 +176,7 @@ class Model(with_metaclass(ModelBase)):
         # FIXME: move import inside loop for custom layers in different modules
         mod = importlib.import_module(meta.layers_mod, meta.layers_pkg)
         src_model = {}
-        for layer, value in self.model.iteritems():
+        for layer, value in iteritems(self.model):
             # from layers module get the layer's class definition
             layer_cls = getattr(mod, meta.layer_cls_names[layer])  # class def
             self.layers[layer] = layer_cls  # add layer class def to model
@@ -204,7 +205,7 @@ class Model(with_metaclass(ModelBase)):
                     value = dict(value['sources'])
                 except ValueError:
                     value = dict.fromkeys(value['sources'], {})
-                for src in value.viewkeys():
+                for src in viewkeys(value):
                     if srcmod is not None:
                         value[src]['module'] = srcmod
                     if srcpkg is not None:
@@ -251,7 +252,7 @@ class Model(with_metaclass(ModelBase)):
         if delete:
             return layer_obj
         # iterate over items and edit layer
-        for k, v in item.iteritems():
+        for k, v in iteritems(item):
             if k in layer_obj.layer:
                 layer_obj.edit(k, v)  # edit layer
             else:
@@ -273,7 +274,7 @@ class Model(with_metaclass(ModelBase)):
         # this should also update Layer.layer, the layer data
         # same as calling layer constructor
         # so now just need to add items to the layer
-        for k, v in items.iteritems():
+        for k, v in iteritems(items):
             getattr(self, layer).add(k, v['module'], v.get('package'))
 
     def delete(self, layer, items):
