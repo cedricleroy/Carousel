@@ -2,6 +2,7 @@
 Test data sources
 """
 
+from future.utils import iteritems
 from nose.tools import ok_, eq_
 from carousel.tests import logging
 from carousel.core import UREG
@@ -123,7 +124,7 @@ def test_datasource_metaclass():
 
     data_test2 = DataSourceTest2(TUSCON)
     ok_(isinstance(data_test2, DataSource))
-    for k, val in data_test1.parameters.iteritems():
+    for k, val in iteritems(data_test1.parameters):
         eq_(data_test2.parameters[k], val)
 
     class DataSourceTest4(DataSource):

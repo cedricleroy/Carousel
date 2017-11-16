@@ -2,6 +2,7 @@
 test calculations
 """
 
+from future.utils import iteritems
 from nose.tools import ok_, eq_
 from carousel.core.calculations import Calc, CalcParameter
 from carousel.core.calculators import Calculator
@@ -61,7 +62,7 @@ def test_calc_metaclass():
 
     calc_test2 = CalcTest2()
     ok_(isinstance(calc_test2, Calc))
-    for k, v in calc_test1.parameters.iteritems():
+    for k, v in iteritems(calc_test1.parameters):
         eq_(calc_test2.parameters[k], v)
 
 

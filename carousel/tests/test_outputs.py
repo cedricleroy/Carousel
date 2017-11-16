@@ -2,6 +2,7 @@
 test outputs
 """
 
+from future.utils import iteritems
 from nose.tools import ok_, eq_
 from carousel.core.outputs import Output
 from carousel.tests import PROJ_PATH
@@ -36,5 +37,5 @@ def test_outputs_metaclass():
 
     out_src_test2 = OutputTest2()
     ok_(isinstance(out_src_test2, Output))
-    for k, v in out_src_test2.parameters.iteritems():
+    for k, v in iteritems(out_src_test2.parameters):
         eq_(out_src_test1.parameters[k], v)
