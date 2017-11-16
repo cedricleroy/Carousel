@@ -3,6 +3,7 @@ Calculators are used to execute calculations.
 """
 
 from future.utils import iteritems
+from past.builtins import xrange
 from past.builtins import basestring
 from carousel.core import logging, UREG
 import numpy as np
