@@ -5,7 +5,8 @@ This module provides base classes for calculations. All calculations should
 inherit from one of the calcs in this module.
 """
 
-from future.utils import with_metaclass
+from future.utils import with_metaclass, iteritems
+from past.builtins import basestring
 from carousel.core import logging, CommonBase, Registry, UREG, Parameter
 from carousel.core.calculators import Calculator
 
@@ -107,7 +108,7 @@ class Calc(with_metaclass(CalcBase)):
         )
         #: calculations
         self.calcs = {}
-        for k, v in parameters.iteritems():
+        for k, v in iteritems(parameters):
             self.calcs[k] = {
                 key: v[key] for key in ('formula', 'args', 'returns')
             }

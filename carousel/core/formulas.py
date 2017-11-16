@@ -6,7 +6,8 @@ from the Formula class in this module. Formula sources must include a
 formula importer, or can subclass one of the formula importers here.
 """
 
-from future.utils import with_metaclass
+from future.utils import with_metaclass, iteritems
+from past.builtins import basestring
 from carousel.core import logging, CommonBase, Registry, UREG, Parameter
 import imp
 import importlib
@@ -173,7 +174,7 @@ class NumericalExpressionImporter(FormulaImporter):
     def import_formulas(self):
         formulas = {}  # an empty list of formulas
         formula_param = self.parameters  # formulas key
-        for f, p in formula_param.iteritems():
+        for f, p in iteritems(formula_param):
             formulas[f] = lambda *args: ne.evaluate(
                 p['extras']['expression'],
                 {k: a for k, a in zip(p['args'], args)}, {}
@@ -251,7 +252,7 @@ class Formula(with_metaclass(FormulaBase)):
         # if formulas is a list or if it can't be iterated as a dictionary
         # then log warning and return
         try:
-            formula_param_generator = formula_param.iteritems()
+            formula_param_generator = iteritems(formula_param)
         except AttributeError as err:
             LOGGER.warning('Attribute Error: %s', err.message)
             return
