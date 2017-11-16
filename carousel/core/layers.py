@@ -26,6 +26,7 @@ be implemented in each subclass of
 """
 
 from future.utils import iteritems
+from past.builtins import basestring
 import importlib
 import os
 from carousel.core import logging, warnings
